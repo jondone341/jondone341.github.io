@@ -10,8 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Teko:wght@600&display=swap" rel="stylesheet">
 
     <style>
-        /* CSS Code */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Teko:wght@600&display=swap');
         :root { --primary-bg: #121212; --card-bg: #1e1e1e; --font-color: #e0e0e0; --secondary-font-color: #b0b0b0; --accent-color-1: #00c6ff; --accent-color-2: #0072ff; --shadow-color: rgba(0, 0, 0, 0.4); --error-color: #ff4d4d; --skeleton-bg: #2a2a2a; --skeleton-highlight: #333; }
         body.light-mode { --primary-bg: #f4f6f8; --card-bg: #ffffff; --font-color: #121212; --secondary-font-color: #555555; --shadow-color: rgba(0, 0, 0, 0.1); --skeleton-bg: #e0e0e0; --skeleton-highlight: #f0f0f0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -61,7 +59,7 @@
         .bookmark-btn:hover { background-color: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
         .bookmark-btn.saved { background-color: var(--accent-color-2); color: white; }
         .loader-container { display: none; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        .error-container { display: none; justify-content: center; align-items: center; padding: 50px 0; width: 100%; }
+        .error-container { display: none; justify-content: center; align-items: center; padding: 50px 0; width: 100%; grid-column: 1 / -1; }
         .skeleton-card { background-color: var(--card-bg); border-radius: 15px; overflow: hidden; }
         .skeleton-image, .skeleton-line { background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--skeleton-highlight) 50%, var(--skeleton-bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
@@ -85,8 +83,6 @@
     </style>
 </head>
 <body>
-
-    <!-- HTML Body -->
     <header>
         <h1 class="app-title">खबरसंग्राम</h1>
         <div class="header-controls">
@@ -94,7 +90,6 @@
                 <select id="language-select">
                     <option value="hi">हिंदी</option>
                     <option value="en">English</option>
-                    <option value="mr">मराठी</option>
                 </select>
             </div>
             <a href="https://saptvlivehd.blogspot.com/" target="_blank" rel="noopener noreferrer" class="header-icon-btn" title="लाइव टीवी देखें">📺</a>
@@ -109,8 +104,9 @@
             <input type="search" id="search-bar" placeholder="कोई भी समाचार खोजें...">
         </div>
         <div id="loader" class="loader-container"></div>
-        <div id="error" class="error-container"></div>
-        <div id="news-container"></div>
+        <div id="news-container">
+             <div id="error" class="error-container"></div>
+        </div>
     </main>
     <div id="webview-modal">
         <div class="webview-container">
@@ -125,9 +121,7 @@
     <button id="back-to-top" title="वापस ऊपर जाएँ">⇧</button>
     
     <script>
-        // JavaScript Code
         document.addEventListener('DOMContentLoaded', () => {
-            const GNEWS_API_KEY = 'd6d7ac2702e71db4a3e8d8c2464ec275';
             const newsContainer = document.getElementById('news-container');
             const loader = document.getElementById('loader');
             const errorContainer = document.getElementById('error');
@@ -141,31 +135,100 @@
             const webviewIframe = document.getElementById('webview-iframe');
             const webviewTitle = webviewModal.querySelector('.webview-title');
             const iframeLoader = webviewModal.querySelector('.iframe-loader');
-            const GNEWS_API_URL = 'https://gnews.io/api/v4';
-            const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+
             const iframeBlockList = [ 'reuters.com', 'apnews.com', 'npr.org', 'wsj.com', 'nytimes.com', 'washingtonpost.com', 'theguardian.com', 'bbc.com', 'cnn.com', 'forbes.com', 'bloomberg.com', 'indiatimes.com', 'timesofindia.com' ];
-            const languages = { hi: { code: 'hi', categories: [{ name: 'मुख्य समाचार', key: 'general' }, { name: 'विश्व', key: 'world' }, { name: 'राष्ट्र', key: 'nation' }, { name: 'व्यापार', key: 'business' }, { name: 'प्रौद्योगिकी', key: 'technology' }, { name: 'मनोरंजन', key: 'entertainment' }, { name: 'खेल', key: 'sports' }, { name: 'विज्ञान', key: 'science' }, { name: 'स्वास्थ्य', key: 'health' }, { name: 'सहेजे गए', key: 'saved' }], defaultCategory: 'general', readMore: 'और पढ़ें', apiKeyError: 'API Key अमान्य है।', errorMsg: 'समाचार लोड करने में विफल।', noNewsMsg: 'इस श्रेणी में कोई समाचार नहीं मिला।', noSavedMsg: 'कोई सहेजा गया समाचार नहीं है।', timeUnits: { second: 'सेकंड पहले', minute: 'मिनट पहले', hour: 'घंटे पहले', day: 'दिन पहले', week: 'सप्ताह पहले', month: 'महीने पहले', year: 'साल पहले' } }, en: { code: 'en', categories: [{ name: 'General', key: 'general' }, { name: 'World', key: 'world' }, { name: 'Nation', key: 'nation' }, { name: 'Business', key: 'business' }, { name: 'Technology', key: 'technology' }, { name: 'Entertainment', key: 'entertainment' }, { name: 'Sports', key: 'sports' }, { name: 'Science', key: 'science' }, { name: 'Health', key: 'health' }, { name: 'Saved', key: 'saved' }], defaultCategory: 'general', readMore: 'Read More', apiKeyError: 'Invalid API Key.', errorMsg: 'Failed to load news.', noNewsMsg: 'No news found in this category.', noSavedMsg: 'No saved articles.', timeUnits: { second: 'seconds ago', minute: 'minutes ago', hour: 'hours ago', day: 'days ago', week: 'weeks ago', month: 'months ago', year: 'years ago' } }, mr: { code: 'mr', categories: [{ name: 'सर्वसाधारण', key: 'general' }, { name: 'जग', key: 'world' }, { name: 'राष्ट्र', key: 'nation' }, { name: 'व्यवसाय', key: 'business' }, { name: 'तंत्रज्ञान', key: 'technology' }, { name: 'मनोरंजन', key: 'entertainment' }, { name: 'क्रीडा', key: 'sports' }, { name: 'विज्ञान', key: 'science' }, { name: 'आरोग्य', key: 'health' }, { name: 'जतन केलेले', key: 'saved' }], defaultCategory: 'general', readMore: 'अधिक वाचा', apiKeyError: 'API की अवैध आहे।', errorMsg: 'बातम्या लोड अयशस्वी।', noNewsMsg: 'कोणत्याही बातम्या आढळल्या नाहीत।', noSavedMsg: 'जतन केलेले लेख नाहीत।', timeUnits: { second: 'सेकंदांपूर्वी', minute: 'मिनिटांपूर्वी', hour: 'तासांपूर्वी', day: 'दिवसांपूर्वी', week: 'आठवड्यांपूर्वी', month: 'महिन्यांपूर्वी', year: 'वर्षांपूर्वी' } } };
+            
+            const languages = {
+                hi: {
+                    code: 'hi',
+                    categories: [{ name: 'मुख्य समाचार', key: 'general' }, { name: 'विश्व', key: 'world' }, { name: 'राष्ट्र', key: 'nation' }, { name: 'व्यापार', key: 'business' }, { name: 'प्रौद्योगिकी', key: 'technology' }, { name: 'मनोरंजन', key: 'entertainment' }, { name: 'खेल', key: 'sports' }, { name: 'विज्ञान', key: 'science' }, { name: 'स्वास्थ्य', key: 'health' }, { name: 'सहेजे गए', key: 'saved' }],
+                    defaultCategory: 'general', readMore: 'और पढ़ें', errorMsg: 'समाचार लोड करने में विफल। कृपया बाद में प्रयास करें।', noNewsMsg: 'इस विषय पर कोई समाचार नहीं मिला।', noSavedMsg: 'कोई सहेजा गया समाचार नहीं है।',
+                    timeUnits: { second: 'सेकंड पहले', minute: 'मिनट पहले', hour: 'घंटे पहले', day: 'दिन पहले', week: 'सप्ताह पहले', month: 'महीने पहले', year: 'साल पहले' }
+                },
+                en: {
+                    code: 'en',
+                    categories: [{ name: 'General', key: 'general' }, { name: 'World', key: 'world' }, { name: 'Nation', key: 'nation' }, { name: 'Business', key: 'business' }, { name: 'Technology', key: 'technology' }, { name: 'Entertainment', key: 'entertainment' }, { name: 'Sports', key: 'sports' }, { name: 'Science', key: 'science' }, { name: 'Health', key: 'health' }, { name: 'Saved', key: 'saved' }],
+                    defaultCategory: 'general', readMore: 'Read More', errorMsg: 'Failed to load news. Please try again later.', noNewsMsg: 'No news found on this topic.', noSavedMsg: 'No saved articles.',
+                    timeUnits: { second: 'seconds ago', minute: 'minutes ago', hour: 'hours ago', day: 'days ago', week: 'weeks ago', month: 'months ago', year: 'years ago' }
+                }
+            };
+
             let currentLanguage = 'hi';
             let currentCategory = languages[currentLanguage].defaultCategory;
             let searchTimeout;
             let savedArticles = [];
 
-            const shareArticle = async (article) => {
-                const myAppUrl = 'https://jondone341.github.io';
-                const encodedArticleUrl = encodeURIComponent(article.url);
-                const shareUrl = `${myAppUrl}/?article_url=${encodedArticleUrl}&title=${encodeURIComponent(article.title)}`;
-                const shareData = {
-                    title: article.title,
-                    text: `${article.description}\n\nपूरी खबर पढ़ें:`,
-                    url: shareUrl,
-                };
-                if (navigator.share) {
-                    try { await navigator.share(shareData); } catch (error) { console.error('Error sharing:', error); }
+            const fetchNews = async (category, lang, query = '') => {
+                showLoader();
+                hideError();
+                
+                let url = `/.netlify/functions/get-news?lang=${lang}`;
+                if (query) {
+                    url += `&q=${encodeURIComponent(query)}`;
                 } else {
-                    navigator.clipboard.writeText(shareUrl);
-                    alert('Share link copied to clipboard!');
+                    url += `&category=${category}`;
+                }
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(languages[lang].errorMsg);
+                    }
+                    const newsData = await response.json();
+                    
+                    if (newsData.error) {
+                         throw new Error(newsData.error);
+                    }
+
+                    if (newsData.articles && newsData.articles.length > 0) {
+                        displayNews(newsData.articles, lang);
+                    } else {
+                        displayError(languages[lang].noNewsMsg);
+                    }
+                } catch (error) {
+                    console.error('Error fetching news:', error);
+                    displayError(error.message);
+                } finally {
+                    hideLoader();
                 }
             };
+            
+            const displayNews = (articles, lang) => {
+                newsContainer.innerHTML = '';
+                articles.forEach((article, index) => {
+                    if (!article.title || article.title === "[Removed]") return;
 
-            const fetchNews = async (endpoint, lang) => { showLoader(); hideError(); const targetUrl = `${GNEWS_API_URL}/${endpoint}&lang=${lang}&token=${GNEWS_API_KEY}`; const url = `${PROXY_URL}${encodeURIComponent(targetUrl)}`; try { const response = await fetch(url); if (!response.ok) { throw new Error(`Proxy Error: ${response.statusText}`); } const newsData = await response.json(); if (newsData.errors) { throw new Error(newsData.errors[0]); } if (newsData.articles && newsData.articles.length > 0) { displayNews(newsData.articles, lang); } else { displayError(languages[lang].noNewsMsg); } } catch (error) { console.error('Error fetching news:', error); displayError(error.message); } finally { hideLoader(); } };
-            const displayNews = (articles, lang) => { newsContainer.innerHTML = ''; articles.forEach((article, index) => { if (!article.title || article.title === "[Removed]") return; const newsCard = document.createElement('div'); newsCard.className = 'news-card'; newsCard.style.animationDelay = `${index * 100}ms`; newsCard.dataset.article = JSON.stringify(article); const imageUrl = article.image || 'https://via.placeholder.com/400x240.png?text=Image+Not+Found'; const isSaved = isArticleSaved(article.url); newsCard.innerHTML = ` <button class="bookmark-btn ${isSaved ? 'saved' : ''}" title="Save Article">🔖</button> <img src="${imageUrl}" alt="${article.title}" class="news-image" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240.png?text=Image+Error';"> <div class="news-content"> <div class="news-meta">${article.source.name} • ${timeAgo(article.publishedAt, lang)}</div> <h2 class="news-title">${article.title}</h2> <p class="news-description">${article.description || ''}</p> <div class="card-actions"> <button class="read-more-btn" data-url="${article.url}">${languages[lang].readMore}</button> <b
+                    const newsCard = document.createElement('div');
+                    newsCard.className = 'news-card';
+                    newsCard.style.animationDelay = `${index * 80}ms`;
+                    newsCard.dataset.article = JSON.stringify(article);
+                    
+                    const imageUrl = article.image || 'https://via.placeholder.com/400x240.png?text=Image+Not+Found';
+                    const isSaved = isArticleSaved(article.url);
+                    
+                    newsCard.innerHTML = `
+                        <button class="bookmark-btn ${isSaved ? 'saved' : ''}" title="Save Article">🔖</button>
+                        <img src="${imageUrl}" alt="${article.title}" class="news-image" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240.png?text=Image+Error';">
+                        <div class="news-content">
+                            <div class="news-meta">${article.source.name} • ${timeAgo(article.publishedAt, lang)}</div>
+                            <h2 class="news-title">${article.title}</h2>
+                            <p class="news-description">${article.description || ''}</p>
+                            <div class="card-actions">
+                                <button class="read-more-btn" data-url="${article.url}">${languages[lang].readMore}</button>
+                                <button class="share-btn" title="Share Article">🔗</button>
+                            </div>
+                        </div>`;
+                    newsContainer.appendChild(newsCard);
+                });
+            };
+
+            const populateCategories = (lang) => {
+                categoryBar.innerHTML = '';
+                languages[lang].categories.forEach(category => {
+                    const button = document.createElement('button');
+                    button.className = 'category-button';
+                    button.textContent = category.name;
+                    button.dataset.category = category.key;
+                    categoryBar.appendChild(button);
+                });
+                const originalButtons = Array.from(catego
