@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>खबरसंग्राम</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Teko:wght@600&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Code */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Teko:wght@600&display=swap');
+        :root { --primary-bg: #121212; --card-bg: #1e1e1e; --font-color: #e0e0e0; --secondary-font-color: #b0b0b0; --accent-color-1: #00c6ff; --accent-color-2: #0072ff; --shadow-color: rgba(0, 0, 0, 0.4); --error-color: #ff4d4d; --skeleton-bg: #2a2a2a; --skeleton-highlight: #333; }
+        body.light-mode { --primary-bg: #f4f6f8; --card-bg: #ffffff; --font-color: #121212; --secondary-font-color: #555555; --shadow-color: rgba(0, 0, 0, 0.1); --skeleton-bg: #e0e0e0; --skeleton-highlight: #f0f0f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--primary-bg); color: var(--font-color); line-height: 1.6; transition: background-color 0.3s, color 0.3s; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: linear-gradient(90deg, #2a0845, #6441a5); border-bottom: 2px solid var(--accent-color-1); animation: pulse-gradient 8s ease-in-out infinite; background-size: 200% 200%; position: sticky; top: 0; z-index: 1001; }
+        @keyframes pulse-gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .app-title { font-family: 'Teko', sans-serif; font-size: 2.5rem; font-weight: 600; letter-spacing: 2px; background: linear-gradient(90deg, #ff8a00, #e52e71, #00c6ff, #ff8a00); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: slide-gradient 10s linear infinite; white-space: nowrap; }
+        @keyframes slide-gradient { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+        .header-controls { display: flex; align-items: center; gap: 15px; }
+        .header-icon-btn { background: none; border: 1px solid var(--accent-color-2); color: #fff; width: 40px; height: 40px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background-color 0.3s, transform 0.3s; padding: 0; text-decoration: none; }
+        .header-icon-btn:hover { background-color: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+        .language-selector select { background-color: var(--card-bg); color: var(--font-color); border: 1px solid var(--accent-color-2); padding: 8px 12px; border-radius: 8px; font-size: 1rem; cursor: pointer; outline: none; transition: background-color 0.3s ease; }
+        body.light-mode .language-selector select:hover { background-color: #e9e9e9; }
+        .category-nav { padding: 15px 0; border-bottom: 1px solid #333; overflow: hidden; position: relative; }
+        body.light-mode .category-nav { border-bottom-color: #ddd; }
+        .category-nav::before, .category-nav::after { content: ''; position: absolute; top: 0; bottom: 0; width: 50px; z-index: 2; pointer-events: none; transition: background-image 0.3s; }
+        .category-nav::before { left: 0; background: linear-gradient(to right, var(--primary-bg), transparent); }
+        .category-nav::after { right: 0; background: linear-gradient(to left, var(--primary-bg), transparent); }
+        .category-nav .categories { display: flex; gap: 10px; padding: 0 10px; width: max-content; animation: scroll-categories 40s linear infinite; }
+        .category-nav:hover .categories { animation-play-state: paused; }
+        @keyframes scroll-categories { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .category-button { padding: 8px 18px; border: 1px solid transparent; border-radius: 20px; background-color: var(--card-bg); color: var(--font-color); cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.3s ease; flex-shrink: 0; white-space: nowrap; }
+        .category-button:hover { background: linear-gradient(90deg, var(--accent-color-1), var(--accent-color-2)); color: white; transform: translateY(-2px); }
+        .category-button.active { background: linear-gradient(90deg, var(--accent-color-1), var(--accent-color-2)); color: white; font-weight: 600; box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3); }
+        .search-container { margin: 20px 0; }
+        #search-bar { width: 100%; padding: 12px 20px; background-color: var(--card-bg); border: 1px solid #333; border-radius: 25px; color: var(--font-color); font-size: 1rem; outline: none; transition: all 0.3s ease; }
+        body.light-mode #search-bar { border-color: #ccc; }
+        #search-bar:focus { border-color: var(--accent-color-1); box-shadow: 0 0 15px rgba(0, 198, 255, 0.2); }
+        #news-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; min-height: 300px; }
+        .news-card { background-color: var(--card-bg); border-radius: 15px; box-shadow: 0 4px 15px var(--shadow-color); overflow: hidden; display: flex; flex-direction: column; opacity: 0; transform: translateY(30px); animation: fadeInUp 0.5s ease-out forwards; border: 1px solid transparent; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; position: relative; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        .news-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 8px 25px rgba(0, 198, 255, 0.25); border-color: var(--accent-color-1); }
+        .news-image { width: 100%; height: 200px; object-fit: cover; }
+        .news-content { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .news-meta { font-size: 0.8rem; color: var(--secondary-font-color); margin-bottom: 10px; }
+        .news-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 10px; flex-grow: 1; }
+        .news-description { font-size: 0.9rem; color: var(--secondary-font-color); margin-bottom: 15px; }
+        .card-actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; }
+        .share-btn { background: var(--primary-bg); border: 1px solid var(--secondary-font-color); color: var(--font-color); width: 40px; height: 40px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; }
+        .share-btn:hover { background: var(--accent-color-1); color: white; border-color: var(--accent-color-1); transform: scale(1.1); }
+        .read-more-btn { cursor: pointer; padding: 10px 20px; background: linear-gradient(90deg, var(--accent-color-1), var(--accent-color-2)); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; border: none; font-family: 'Poppins', sans-serif; font-size: 0.9rem; }
+        .read-more-btn:hover { opacity: 0.9; box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3); }
+        .bookmark-btn { position: absolute; top: 10px; right: 10px; background-color: rgba(0, 0, 0, 0.5); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s, transform 0.3s; opacity: 0.7; z-index: 5; }
+        .news-card:hover .bookmark-btn { opacity: 1; }
+        .bookmark-btn:hover { background-color: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
+        .bookmark-btn.saved { background-color: var(--accent-color-2); color: white; }
+        .loader-container { display: none; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .error-container { display: none; justify-content: center; align-items: center; padding: 50px 0; width: 100%; }
+        .skeleton-card { background-color: var(--card-bg); border-radius: 15px; overflow: hidden; }
+        .skeleton-image, .skeleton-line { background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--skeleton-highlight) 50%, var(--skeleton-bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-image { height: 200px; }
+        .skeleton-content { padding: 20px; }
+        .skeleton-line { height: 12px; border-radius: 4px; margin-bottom: 12px; }
+        .skeleton-line:last-child { margin-bottom: 0; }
+        .error-message { color: var(--error-color); font-size: 1.2rem; text-align: center; background-color: rgba(255, 77, 77, 0.1); padding: 20px; border-radius: 10px; border: 1px solid var(--error-color); }
+        #back-to-top { position: fixed; bottom: 20px; right: 20px; background: linear-gradient(45deg, var(--accent-color-1), var(--accent-color-2)); color: white; border: none; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px var(--shadow-color); opacity: 0; visibility: hidden; transform: translateY(100px); transition: opacity 0.3s, visibility 0.3s, transform 0.4s ease-out; z-index: 1000; }
+        #back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        #webview-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; backdrop-filter: blur(5px); }
+        #webview-modal.show { display: flex; opacity: 1; visibility: visible; }
+        .webview-container { background-color: var(--primary-bg); width: 100%; height: 100%; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s; border-radius: 10px; overflow: hidden; }
+        #webview-modal.show .webview-container { transform: scale(1); }
+        .webview-header { display: flex; align-items: center; padding: 10px; background-color: var(--card-bg); flex-shrink: 0; }
+        .webview-close-btn { font-size: 1.5rem; background: none; border: none; color: var(--font-color); cursor: pointer; padding: 5px 10px; }
+        .webview-title { font-size: 0.9rem; color: var(--secondary-font-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; margin: 0 10px; }
+        #webview-iframe { width: 100%; height: 100%; border: none; }
+        .iframe-loader { color: var(--accent-color-1); font-size: 1.5rem; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        @media (max-width: 768px) { .app-title { font-size: 1.8rem; } .header-controls { gap: 10px; } .header-icon-btn { width: 35px; height: 35px; font-size: 1.2rem; } .language-selector select { font-size: 0.9rem; padding: 6px 8px; } .container { padding: 10px; } .webview-container { width: 100%; height: 100%; border-radius: 0; } }
+    </style>
+</head>
+<body>
+
+    <!-- HTML Body -->
+    <header>
+        <h1 class="app-title">खबरसंग्राम</h1>
+        <div class="header-controls">
+            <div class="language-selector">
+                <select id="language-select">
+                    <option value="hi">हिंदी</option>
+                    <option value="en">English</option>
+                    <option value="mr">मराठी</option>
+                </select>
+            </div>
+            <a href="https://saptvlivehd.blogspot.com/" target="_blank" rel="noopener noreferrer" class="header-icon-btn" title="लाइव टीवी देखें">📺</a>
+            <button id="theme-toggle" class="header-icon-btn" title="Change Theme">🌙</button>
+        </div>
+    </header>
+    <nav class="category-nav">
+        <div id="category-bar" class="categories"></div>
+    </nav>
+    <main class="container">
+        <div class="search-container">
+            <input type="search" id="search-bar" placeholder="कोई भी समाचार खोजें...">
+        </div>
+        <div id="loader" class="loader-container"></div>
+        <div id="error" class="error-container"></div>
+        <div id="news-container"></div>
+    </main>
+    <div id="webview-modal">
+        <div class="webview-container">
+            <div class="webview-header">
+                <button class="webview-close-btn" title="Close">✖</button>
+                <p class="webview-title"></p>
+            </div>
+            <div class="iframe-loader">Loading...</div>
+            <iframe id="webview-iframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+        </div>
+    </div>
+    <button id="back-to-top" title="वापस ऊपर जाएँ">⇧</button>
+    
+    <script>
+        // JavaScript Code
+        document.addEventListener('DOMContentLoaded', () => {
+            const GNEWS_API_KEY = 'd6d7ac2702e71db4a3e8d8c2464ec275';
+            const newsContainer = document.getElementById('news-container');
+            const loader = document.getElementById('loader');
+            const errorContainer = document.getElementById('error');
+            const categoryBar = document.getElementById('category-bar');
+            const languageSelect = document.getElementById('language-select');
+            const searchBar = document.getElementById('search-bar');
+            const backToTopButton = document.getElementById('back-to-top');
+            const themeToggleButton = document.getElementById('theme-toggle');
+            const webviewModal = document.getElementById('webview-modal');
+            const webviewCloseBtn = webviewModal.querySelector('.webview-close-btn');
+            const webviewIframe = document.getElementById('webview-iframe');
+            const webviewTitle = webviewModal.querySelector('.webview-title');
+            const iframeLoader = webviewModal.querySelector('.iframe-loader');
+            const GNEWS_API_URL = 'https://gnews.io/api/v4';
+            const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+            const iframeBlockList = [ 'reuters.com', 'apnews.com', 'npr.org', 'wsj.com', 'nytimes.com', 'washingtonpost.com', 'theguardian.com', 'bbc.com', 'cnn.com', 'forbes.com', 'bloomberg.com', 'indiatimes.com', 'timesofindia.com' ];
+            const languages = { hi: { code: 'hi', categories: [{ name: 'मुख्य समाचार', key: 'general' }, { name: 'विश्व', key: 'world' }, { name: 'राष्ट्र', key: 'nation' }, { name: 'व्यापार', key: 'business' }, { name: 'प्रौद्योगिकी', key: 'technology' }, { name: 'मनोरंजन', key: 'entertainment' }, { name: 'खेल', key: 'sports' }, { name: 'विज्ञान', key: 'science' }, { name: 'स्वास्थ्य', key: 'health' }, { name: 'सहेजे गए', key: 'saved' }], defaultCategory: 'general', readMore: 'और पढ़ें', apiKeyError: 'API Key अमान्य है।', errorMsg: 'समाचार लोड करने में विफल।', noNewsMsg: 'इस श्रेणी में कोई समाचार नहीं मिला।', noSavedMsg: 'कोई सहेजा गया समाचार नहीं है।', timeUnits: { second: 'सेकंड पहले', minute: 'मिनट पहले', hour: 'घंटे पहले', day: 'दिन पहले', week: 'सप्ताह पहले', month: 'महीने पहले', year: 'साल पहले' } }, en: { code: 'en', categories: [{ name: 'General', key: 'general' }, { name: 'World', key: 'world' }, { name: 'Nation', key: 'nation' }, { name: 'Business', key: 'business' }, { name: 'Technology', key: 'technology' }, { name: 'Entertainment', key: 'entertainment' }, { name: 'Sports', key: 'sports' }, { name: 'Science', key: 'science' }, { name: 'Health', key: 'health' }, { name: 'Saved', key: 'saved' }], defaultCategory: 'general', readMore: 'Read More', apiKeyError: 'Invalid API Key.', errorMsg: 'Failed to load news.', noNewsMsg: 'No news found in this category.', noSavedMsg: 'No saved articles.', timeUnits: { second: 'seconds ago', minute: 'minutes ago', hour: 'hours ago', day: 'days ago', week: 'weeks ago', month: 'months ago', year: 'years ago' } }, mr: { code: 'mr', categories: [{ name: 'सर्वसाधारण', key: 'general' }, { name: 'जग', key: 'world' }, { name: 'राष्ट्र', key: 'nation' }, { name: 'व्यवसाय', key: 'business' }, { name: 'तंत्रज्ञान', key: 'technology' }, { name: 'मनोरंजन', key: 'entertainment' }, { name: 'क्रीडा', key: 'sports' }, { name: 'विज्ञान', key: 'science' }, { name: 'आरोग्य', key: 'health' }, { name: 'जतन केलेले', key: 'saved' }], defaultCategory: 'general', readMore: 'अधिक वाचा', apiKeyError: 'API की अवैध आहे।', errorMsg: 'बातम्या लोड अयशस्वी।', noNewsMsg: 'कोणत्याही बातम्या आढळल्या नाहीत।', noSavedMsg: 'जतन केलेले लेख नाहीत।', timeUnits: { second: 'सेकंदांपूर्वी', minute: 'मिनिटांपूर्वी', hour: 'तासांपूर्वी', day: 'दिवसांपूर्वी', week: 'आठवड्यांपूर्वी', month: 'महिन्यांपूर्वी', year: 'वर्षांपूर्वी' } } };
+            let currentLanguage = 'hi';
+            let currentCategory = languages[currentLanguage].defaultCategory;
+            let searchTimeout;
+            let savedArticles = [];
+            const fetchNews = async (endpoint, lang) => { showLoader(); hideError(); const targetUrl = `${GNEWS_API_URL}/${endpoint}&lang=${lang}&token=${GNEWS_API_KEY}`; const url = `${PROXY_URL}${encodeURIComponent(targetUrl)}`; try { const response = await fetch(url); if (!response.ok) { throw new Error(`Proxy Error: ${response.statusText}`); } const newsData = await response.json(); if (newsData.errors) { throw new Error(newsData.errors[0]); } if (newsData.articles && newsData.articles.length > 0) { displayNews(newsData.articles, lang); } else { displayError(languages[lang].noNewsMsg); } } catch (error) { console.error('Error fetching news:', error); displayError(error.message); } finally { hideLoader(); } };
+            const displayNews = (articles, lang) => { newsContainer.innerHTML = ''; articles.forEach((article, index) => { if (!article.title || article.title === "[Removed]") return; const newsCard = document.createElement('div'); newsCard.className = 'news-card'; newsCard.style.animationDelay = `${index * 100}ms`; newsCard.dataset.article = JSON.stringify(article); const imageUrl = article.image || 'https://via.placeholder.com/400x240.png?text=Image+Not+Found'; const isSaved = isArticleSaved(article.url); newsCard.innerHTML = ` <button class="bookmark-btn ${isSaved ? 'saved' : ''}" title="Save Article">🔖</button> <img src="${imageUrl}" alt="${article.title}" class="news-image" onerror="this.onerror=null;this.src='https://via.placeholder.com/400x240.png?text=Image+Error';"> <div class="news-content"> <div class="news-meta">${article.source.name} • ${timeAgo(article.publishedAt, lang)}</div> <h2 class="news-title">${article.title}</h2> <p class="news-description">${article.description || ''}</p> <div class="card-actions"> <button class="read-more-btn" data-url="${article.url}">${languages[lang].readMore}</button> <button class="share-btn" title="Share Article">🔗</button> </div> </div>`; newsContainer.appendChild(newsCard); }); };
+            const populateCategories = (lang) => { categoryBar.innerHTML = ''; languages[lang].categories.forEach(category => { const button = document.createElement('button'); button.className = 'category-button'; button.textContent = category.name; button.dataset.category = category.key; categoryBar.appendChild(button); }); const originalButtons = Array.from(categoryBar.children); originalButtons.forEach(button => { const clone = button.cloneNode(true); clone.setAttribute('aria-hidden', 'true'); categoryBar.appendChild(clone); }); updateActiveCategory(currentCategory); };
+            const updateActiveCategory = (category) => { document.querySelectorAll('.category-button').forEach(button => { button.classList.toggle('active', button.dataset.category === category); }); };
+            const showLoader = () => { newsContainer.style.display = 'none'; loader.innerHTML = ''; for (let i = 0; i < 6; i++) { loader.innerHTML += `<div class="skeleton-card"><div class="skeleton-image"></div><div class="skeleton-content"><div class="skeleton-line" style="width: 70%;"></div><div class="skeleton-line"></div><div class="skeleton-line" style="width: 90%;"></div></div></div>`; } loader.style.display = 'grid'; };
+            const hideLoader = () => { loader.style.display = 'none'; newsContainer.style.display = 'grid'; }; const showError = () => { errorContainer.style.display = 'flex'; }; const hideError = () => { errorContainer.style.display = 'none'; }; const displayError = (message) => { hideLoader(); newsContainer.innerHTML = ''; errorContainer.innerHTML = `<p class="error-message">${message}</p>`; showError(); }; const timeAgo = (isoDate, lang) => { const units = languages[lang].timeUnits; if (!isoDate) return ''; const date = new Date(isoDate); const seconds = Math.floor((new Date() - date) / 1000); const intervals = [ { value: 31536000, unit: 'year' }, { value: 2592000, unit: 'month' }, { value: 604800, unit: 'week' }, { value: 86400, unit: 'day' }, { value: 3600, unit: 'hour' }, { value: 60, unit: 'minute' } ]; for (const interval of intervals) { const value = seconds / interval.value; if (value > 1) { return `${Math.floor(value)} ${units[interval.unit]}`; } } return `${Math.floor(seconds)} ${units.second}`; };
+            const loadSavedArticles = () => { savedArticles = JSON.parse(localStorage.getItem('savedNews')) || []; }; const saveArticleToStorage = () => { localStorage.setItem('savedNews', JSON.stringify(savedArticles)); }; const isArticleSaved = (url) => savedArticles.some(article => article.url === url);
+            const toggleBookmark = (article, button) => { const articleIndex = savedArticles.findIndex(a => a.url === article.url); if (articleIndex > -1) { savedArticles.splice(articleIndex, 1); button.classList.remove('saved'); } else { savedArticles.push(article); button.classList.add('saved'); } saveArticleToStorage(); if (currentCategory === 'saved') { displaySavedNews(currentLanguage); } };
+            const displaySavedNews = (lang) => { hideLoader(); if(savedArticles.length > 0) { displayNews(savedArticles.slice().reverse(), lang); } else { displayError(languages[lang].noSavedMsg); } };
+            const shareArticle = async (article) => { if (navigator.share) { try { await navigator.share({ title: article.title, text: article.description, url: article.url }); } catch (error) { console.error('Error sharing:', error); } } else { alert('Sharing is not supported on this browser.'); } };
+            const changeLanguage = (lang) => { currentLanguage = lang; populateCategories(lang); searchBar.placeholder = { hi: 'कोई भी समाचार खोजें...', en: 'Search for any news...', mr: 'कोणतीही बातमी शोधा...' }[lang]; document.documentElement.lang = lang; handleCategoryClick(currentCategory); };
+            const handleCategoryClick = (category) => { currentCategory = category; updateActiveCategory(category); searchBar.value = ''; if (category === 'saved') { displaySavedNews(currentLanguage); } else { const topic = category === 'general' ? 'breaking-news' : category; fetchNews(`top-headlines?topic=${topic}`, currentLanguage); } };
+            const openWebView = (url, title) => { webviewTitle.textContent = title; iframeLoader.style.display = 'block'; webviewIframe.style.visibility = 'hidden'; webviewIframe.src = url; webviewModal.classList.add('show'); document.body.style.overflow = 'hidden'; };
+            const closeWebView = () => { webviewModal.classList.remove('show'); webviewIframe.src = 'about:blank'; document.body.style.overflow = 'auto'; };
+            categoryBar.addEventListener('click', (e) => { if (e.target.classList.contains('category-button')) { const category = e.target.dataset.category; if(category) handleCategoryClick(category); } });
+            newsContainer.addEventListener('click', (e) => { const card = e.target.closest('.news-card'); if (!card) return; const article = JSON.parse(card.dataset.article); if (e.target.classList.contains('bookmark-btn')) { toggleBookmark(article, e.target); } else if (e.target.classList.contains('share-btn')) { shareArticle(article); } else if (e.target.classList.contains('read-more-btn')) { const articleUrl = e.target.dataset.url; const shouldOpenInNewTab = iframeBlockList.some(blockedDomain => articleUrl.includes(blockedDomain)); if (shouldOpenInNewTab) { window.open(articleUrl, '_blank', 'noopener,noreferrer'); } else { openWebView(articleUrl, article.title); } } });
+            languageSelect.addEventListener('change', (e) => { changeLanguage(e.target.value); });
+            searchBar.addEventListener('input', (e) => { clearTimeout(searchTimeout); const query = e.target.value.trim(); if (query.length > 2) { searchTimeout = setTimeout(() => { fetchNews(`search?q=${encodeURIComponent(query)}`, currentLanguage); updateActiveCategory(null); }, 500); } else if (query.length === 0) { handleCategoryClick(currentCategory || languages[currentLanguage].defaultCategory); } });
+            themeToggleButton.addEventListener('click', () => { document.body.classList.toggle('light-mode'); themeToggleButton.textContent = document.body.classList.contains('light-mode') ? '☀️' : '🌙'; localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark'); });
+            window.addEventListener('scroll', () => { backToTopButton.classList.toggle('show', window.scrollY > 300); }); backToTopButton.addEventListener('click', () => { window.scrollTo(0, 0); });
+            webviewCloseBtn.addEventListener('click', closeWebView); webviewModal.addEventListener('click', (e) => { if(e.target === webviewModal) closeWebView(); }); webviewIframe.onload = () => { iframeLoader.style.display = 'none'; webviewIframe.style.visibility = 'visible'; };
+            const init = () => { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'light') { document.body.classList.add('light-mode'); themeToggleButton.textContent = '☀️'; } loadSavedArticles(); populateCategories(currentLanguage); handleCategoryClick(currentCategory); };
+            init();
+        });
+    </script>
+
+</body>
+</html>
